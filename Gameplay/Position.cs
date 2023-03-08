@@ -1,4 +1,4 @@
-﻿namespace Minesweeper
+﻿namespace Minesweeper.Gameplay
 {
     /// <summary>
     /// A struct representing a 2D position on the game map
@@ -13,7 +13,7 @@
         /// The vertical position on the map
         /// </summary>
         public int y;
-        
+
         public Position(int x, int y)
         {
             this.x = x;

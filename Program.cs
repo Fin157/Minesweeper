@@ -1,4 +1,8 @@
-﻿namespace Minesweeper;
+﻿using Minesweeper.Commands;
+using Minesweeper.Gameplay;
+using Minesweeper.Input;
+
+namespace Minesweeper;
 
 internal class Program
 {
@@ -8,34 +12,29 @@ internal class Program
 
     private static void Main(string[] args)
     {
-        Tile[,] map = MapGenerator.GenerateMap(MAP_SIZE_X, MAP_SIZE_Y, MINE_COUNT);
+        Map map = Map.GenerateMap(MAP_SIZE_X, MAP_SIZE_Y, MINE_COUNT);
 
         // Initiate the game loop
         GameLoop(map);
     }
 
-    private static void GameLoop(Tile[,] map)
+    private static void GameLoop(Map map)
     {
         // Gather user input
-        Input userInput = TakeInput();
+        if (!InputManager.TakeInput(out ICommand? command, out string[] commandData) || command == null)
+            return;
 
         // Process the input
-        ProcessInput(userInput);
+        ProcessInput(map, command, commandData);
 
         // Render the changes
         Render();
     }
 
-    private static Input TakeInput()
-    {
-        // Get the position of the affected tile
-
-        // Get the command type to be executed on the chosen tile
-    }
-
-    private static void ProcessInput(Input userInput)
+    private static void ProcessInput(Map map, ICommand command, string[] commandData)
     {
         // Execute the chosen command on the specified tile
+        command.Execute(map, commandData);
     }
 
     private static void Render()

@@ -1,4 +1,4 @@
-﻿namespace Minesweeper;
+﻿namespace Minesweeper.Gameplay;
 
 /// <summary>
 /// A class representing a tile where a mine is hidden
@@ -9,8 +9,6 @@ internal class MineTile : Tile
 
     protected override void OnUncover()
     {
-        base.OnUncover();
-
         // This is game over, the player tried to dig up a mine and exploded
         // Let the game loop know
     }

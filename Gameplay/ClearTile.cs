@@ -1,4 +1,4 @@
-﻿namespace Minesweeper;
+﻿namespace Minesweeper.Gameplay;
 
 /// <summary>
 /// A class representing a tile where no mine is hidden
@@ -20,7 +20,7 @@ internal class ClearTile : Tile
     /// <summary>
     /// Stores how many mines this tile neighbours
     /// </summary>
-    private int minesAround;
+    private readonly int minesAround;
 
     public ClearTile(int x, int y, int minesAround) : base(x, y)
     {
@@ -29,6 +29,6 @@ internal class ClearTile : Tile
 
     protected override void OnUncover()
     {
-        base.OnUncover();
+        
     }
 }

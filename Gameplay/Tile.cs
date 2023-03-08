@@ -1,4 +1,4 @@
-﻿namespace Minesweeper;
+﻿namespace Minesweeper.Gameplay;
 
 /// <summary>
 /// A base class for any tile on the map
@@ -37,7 +37,8 @@ internal abstract class Tile
         set
         {
             isUncovered = value;
-            OnUncover();
+            if (value) // Execute only if the new value is true
+                OnUncover();
         }
     }
 
@@ -54,8 +55,5 @@ internal abstract class Tile
     /// <summary>
     /// Gets called when this tile instance gets uncovered
     /// </summary>
-    protected virtual void OnUncover()
-    {
-        IsUncovered = true;
-    }
+    protected abstract void OnUncover();
 }
