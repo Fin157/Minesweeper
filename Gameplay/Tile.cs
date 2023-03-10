@@ -23,6 +23,8 @@ internal abstract class Tile
             // Prevent ouside code from marking an uncovered tile
             if (!isUncovered)
                 return;
+
+            isMarked = value;
         }
     }
     /// <summary>
