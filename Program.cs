@@ -1,7 +1,6 @@
 ﻿using Minesweeper.Commands;
 using Minesweeper.Gameplay;
 using Minesweeper.Input;
-using System.Drawing;
 
 namespace Minesweeper;
 
@@ -26,6 +25,9 @@ internal class Program
 
     private static void GameLoop(Map map)
     {
+        // Render the empty field
+        Render();
+
         while (IsGameRunning)
         {
             // Gather user input
@@ -56,29 +58,33 @@ internal class Program
 
         for (int y = 0; y < map.tiles.GetLength(0); y++)
         {
+            string mapLine = "";
+
             for (int x = 0; x < map.tiles.GetLength(1); x++)
             {
                 Tile t = map.tiles[x, y];
-                string renderText;
+                string tileText;
                 if (!t.IsUncovered) // If the tile hasn't been uncovered yet
                 {
                     if (t.IsMarked)
-                        renderText = "--";
+                        tileText = "--";
                     else
-                        renderText = "  ";
+                        tileText = "  ";
                 }
                 else
-                    renderText = (t as ClearTile)?.MinesAround + " ";
+                    tileText = (t as ClearTile)?.MinesAround + " ";
 
                 Console.BackgroundColor = isDarker ? COLOUR_DARK : COLOUR_LIGHT;
-                Console.Write(renderText);
+                mapLine += tileText;
                 isDarker = !isDarker;
             }
 
-            Console.WriteLine();
+            BufferedRenderer.AddLine(mapLine);
             isDarker = !isDarker;
         }
 
         Console.BackgroundColor = ConsoleColor.Black;
+
+        BufferedRenderer.Render();
     }
 }

@@ -7,12 +7,13 @@ namespace Minesweeper.Input;
 /// </summary>
 internal static class InputManager
 {
-    private static readonly List<ICommand> commandMappings = new()
+    public static readonly Dictionary<CommandData, ICommand> CommandMappings = new()
     {
-        new HelpCommand("HELP"),
-        new DigCommand("DIG"),
-        new MarkCommand("MARK"),
-        new UnmarkCommand("UNMK")
+        [new("HELP", "Lists all available commands.")] = new HelpCommand(),
+        [new("DIG", "Digs up the specified covered tile.", "tile X", "tile Y")] = new DigCommand(),
+        [new("MARK", "Marks the specified uncovered tile.", "tile X", "tile Y")] = new MarkCommand(),
+        [new("UNMK", "Unmarks the specified marked uncovered tile.", "tile X", "tile Y")] = new UnmarkCommand(),
+        [new("QUIT", "Quits game.")] = new LeaveGameCommand()
     };
 
     public static bool TakeInput(out ICommand? command, out string[] commandData)
@@ -35,11 +36,11 @@ internal static class InputManager
             return false;
 
         // Find out which command the user chose
-        foreach (ICommand c in commandMappings)
+        foreach (CommandData cd in CommandMappings.Keys)
         {
-            if (splitInput[0] == c.Code)
+            if (splitInput[0] == cd.Code)
             {
-                command = c;
+                command = CommandMappings[cd];
                 break;
             }
         }

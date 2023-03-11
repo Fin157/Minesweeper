@@ -2,10 +2,11 @@
 
 namespace Minesweeper.Commands;
 
-internal class DigCommand : ICommand
+internal class LeaveGameCommand : ICommand
 {
     public void Execute(Map map, string[] userInput)
     {
-        //map[pos.x, pos.y].IsUncovered = true;
+        // Leave game
+        Program.IsGameRunning = false;
     }
 }
