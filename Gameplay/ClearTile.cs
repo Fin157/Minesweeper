@@ -29,6 +29,6 @@ internal class ClearTile : Tile
 
     protected override void OnUncover()
     {
-        
+        // Do nothing
     }
 }

@@ -11,5 +11,6 @@ internal class MineTile : Tile
     {
         // This is game over, the player tried to dig up a mine and exploded
         // Let the game loop know
+        Program.IsGameRunning = false;
     }
 }

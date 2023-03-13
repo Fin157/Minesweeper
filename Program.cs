@@ -1,16 +1,17 @@
 ﻿using Minesweeper.Commands;
 using Minesweeper.Gameplay;
 using Minesweeper.Input;
+using Minesweeper.Rendering;
 
 namespace Minesweeper;
 
 internal class Program
 {
-    private const ConsoleColor COLOUR_LIGHT = ConsoleColor.Green;
-    private const ConsoleColor COLOUR_DARK = ConsoleColor.DarkGreen;
     private const int MAP_SIZE_X = 20;
     private const int MAP_SIZE_Y = 20;
     private const int MINE_COUNT = 25;
+    private const int UNCOVERED_STARTING_TILES_MIN = 10;
+    private const int UNCOVERED_STARTING_TILES_MAX = 10;
 
     public static bool IsGameRunning { get; set; }
 
@@ -26,65 +27,26 @@ internal class Program
     private static void GameLoop(Map map)
     {
         // Render the empty field
-        Render();
+        MapRenderer.Render(map);
 
         while (IsGameRunning)
         {
             // Gather user input
-            if (!InputManager.TakeInput(out ICommand? command, out string[] commandData) || command == null)
+            if (!InputManager.TakeInput(out Command? command, out string[] commandData) || command == null)
                 return;
 
             // Process the input
-            ProcessInput(map, command, commandData);
+            bool isRenderNeeded = ProcessInput(map, command, commandData);
 
-            // Render the changes
-            Render();
+            // Render the changes if needed
+            if (isRenderNeeded)
+                MapRenderer.Render(map);
         }
     }
 
-    private static void ProcessInput(Map map, ICommand command, string[] commandData)
+    private static bool ProcessInput(Map map, Command command, string[] commandData)
     {
         // Execute the chosen command on the specified tile
-        command.Execute(map, commandData);
-    }
-
-    private static void Render()
-    {
-        Console.Clear();
-
-        // Controls if the next tile is going to be drawn a lighter or darker variant to
-        // distinct neighbour tiles from each other
-        bool isDarker = false;
-
-        for (int y = 0; y < map.tiles.GetLength(0); y++)
-        {
-            string mapLine = "";
-
-            for (int x = 0; x < map.tiles.GetLength(1); x++)
-            {
-                Tile t = map.tiles[x, y];
-                string tileText;
-                if (!t.IsUncovered) // If the tile hasn't been uncovered yet
-                {
-                    if (t.IsMarked)
-                        tileText = "--";
-                    else
-                        tileText = "  ";
-                }
-                else
-                    tileText = (t as ClearTile)?.MinesAround + " ";
-
-                Console.BackgroundColor = isDarker ? COLOUR_DARK : COLOUR_LIGHT;
-                mapLine += tileText;
-                isDarker = !isDarker;
-            }
-
-            BufferedRenderer.AddLine(mapLine);
-            isDarker = !isDarker;
-        }
-
-        Console.BackgroundColor = ConsoleColor.Black;
-
-        BufferedRenderer.Render();
+        return command.Execute(map, commandData);
     }
 }

@@ -1,14 +1,42 @@
 ﻿namespace Minesweeper.Gameplay;
 
+/// <summary>
+/// A class representing a game field consisting of tiles
+/// </summary>
 internal class Map
 {
-    public Tile[,] tiles;
+    /// <summary>
+    /// X size of the map
+    /// </summary>
+    public int LengthX { get => tiles.GetLength(1); }
+    /// <summary>
+    /// Y size of the map
+    /// </summary>
+    public int LengthY { get => tiles.GetLength(0); }
+    /// <summary>
+    /// Accesses individual tiles of the map
+    /// </summary>
+    /// <param name="x">The X position of the tile</param>
+    /// <param name="y">The Y position of the tile</param>
+    /// <returns>A tile to use in read/write operations</returns>
+    public Tile this[int x, int y]
+    {
+        get => tiles[x, y];
+        set => tiles[x, y] = value;
+    }
+
+    private readonly Tile[,] tiles;
 
     private Map(Tile[,] tiles)
     {
         this.tiles = tiles;
     }
 
+    /// <summary>
+    /// Checks if the input position is inside the map
+    /// </summary>
+    /// <param name="pos">The position to be checked</param>
+    /// <returns>True if the position fulfills the conditions, otherwise false</returns>
     public bool IsPositionValid(Position pos)
     {
         return (pos.x >= 0 && pos.x < tiles.GetLength(1) && pos.y >= 0 && pos.y < tiles.GetLength(0));
