@@ -2,6 +2,10 @@
 
 internal class TileRenderer
 {
+    /// <summary>
+    /// Controls if the tile this renderer belongs to is darker or not
+    /// </summary>
+    private readonly bool isDarker;
     private readonly Dictionary<string, TileColour> tileColours = new()
     {
         ["regular"] = new(ConsoleColor.Green, ConsoleColor.DarkGreen),
@@ -9,7 +13,12 @@ internal class TileRenderer
         ["uncovered"] = new(ConsoleColor.Blue, ConsoleColor.DarkBlue)
     };
 
-    public void Render(Tile owner, bool isDarker)
+    public TileRenderer(bool isDarker)
+    {
+        this.isDarker = isDarker;
+    }
+
+    public void Render(Tile owner)
     {
         string renderText = "  ";
         TileColour renderColour;

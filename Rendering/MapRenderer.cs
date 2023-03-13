@@ -29,7 +29,7 @@ internal static class MapRenderer
 
             for (int x = 0; x < map.LengthX; x++)
             {
-                map[x, y].Render(isDarker);
+                map[x, y].Render();
                 isDarker = !isDarker;
             }
 

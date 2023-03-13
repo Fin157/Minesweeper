@@ -72,8 +72,8 @@ internal class Map
         // Prepare a list of all the positions where a mine can be placed
         // Initially stores all the positions of the map
         List<Position> available = new();
-        for (int y = 0; y < map.tiles.GetLength(0); y++)
-            for (int x = 0; x < map.tiles.GetLength(1); x++)
+        for (int y = 0; y < map.LengthY; y++)
+            for (int x = 0; x < map.LengthX; x++)
                 available.Add(new(x, y));
         Random r = new();
 
@@ -85,7 +85,7 @@ internal class Map
 
             // Consume the position (remove it from the list)
             Position minePos = available[posIndex];
-            map.tiles[minePos.x, minePos.y] = new MineTile(minePos.x, minePos.y);
+            map[minePos.x, minePos.y] = new MineTile(minePos.x, minePos.y, IsDarker(minePos));
 
             available.RemoveAt(posIndex);
         }
@@ -101,7 +101,7 @@ internal class Map
     private static void CalculateClearTiles(Map map, List<Position> clearTiles)
     {
         // An array of positions considered to be neighbours
-        Position[] neighbours =
+        Position[] neighboursRelative =
         {
                 new(-1, -1),
                 new(0, -1),
@@ -111,24 +111,46 @@ internal class Map
                 new(0, 1),
                 new(-1, 1),
                 new(-1, 0)
-            };
+        };
+
+        HashSet<Position> positionsToUpdate = new();
 
         // Loop through the whole map
         foreach (Position pos in clearTiles)
         {
             int minesAround = 0;
 
+            List<Position> neighboursAbsolute = new();
+
             // Check all the surrounding positions for mines
-            foreach (Position n in neighbours)
+            foreach (Position n in neighboursRelative)
             {
                 Position neighbourAbsolute = pos.Combine(n);
-                if (map.IsPositionValid(neighbourAbsolute) && map.tiles[neighbourAbsolute.x, neighbourAbsolute.y] is MineTile)
+                if (map.IsPositionValid(neighbourAbsolute) && map[neighbourAbsolute.x, neighbourAbsolute.y] is MineTile)
+                {
+                    neighboursAbsolute.Add(n);
                     minesAround++;
+                }
             }
 
             // Place the clear tile
-            map.tiles[pos.x, pos.y] = new ClearTile(pos.x, pos.y, minesAround);
+            map[pos.x, pos.y] = new ClearTile(pos.x, pos.y, IsDarker(pos), minesAround);
+
+            if (minesAround == 0)
+                map[pos.x, pos.y].IsUncovered = true;
         }
+    }
+
+    /// <summary>
+    /// Checks if a tile at the specified position should be rendered darker or not
+    /// </summary>
+    /// <param name="pos">A position where the tile is</param>
+    /// <returns>True if the tile should be rendered darker, otherwise false</returns>
+    private static bool IsDarker(Position pos)
+    {
+        // Controls if the odd X values in this row should be dark (1) or light (0)
+        int areOddDark = pos.y % 2;
+        return pos.x % 2 == areOddDark;
     }
     #endregion
 }

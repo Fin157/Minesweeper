@@ -48,18 +48,15 @@ internal abstract class Tile
     protected bool isMarked;
     protected TileRenderer renderer;
 
-    public Tile(int x, int y)
+    public Tile(int x, int y, bool isDarker)
     {
         IsMarked = false;
         IsUncovered = false;
         Position = new(x, y);
-        renderer = new();
+        renderer = new(isDarker);
     }
 
-    public void Render(bool isDarker)
-    {
-        renderer.Render(this, isDarker);
-    }
+    public void Render() => renderer.Render(this);
 
     protected abstract void OnUncover();
 }

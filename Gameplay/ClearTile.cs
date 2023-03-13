@@ -22,7 +22,7 @@ internal class ClearTile : Tile
     /// </summary>
     private readonly int minesAround;
 
-    public ClearTile(int x, int y, int minesAround) : base(x, y)
+    public ClearTile(int x, int y, bool isDarker, int minesAround) : base(x, y, isDarker)
     {
         this.minesAround = minesAround;
     }

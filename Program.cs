@@ -9,9 +9,7 @@ internal class Program
 {
     private const int MAP_SIZE_X = 20;
     private const int MAP_SIZE_Y = 20;
-    private const int MINE_COUNT = 25;
-    private const int UNCOVERED_STARTING_TILES_MIN = 10;
-    private const int UNCOVERED_STARTING_TILES_MAX = 10;
+    private const int MINE_COUNT = 100;
 
     public static bool IsGameRunning { get; set; }
 
@@ -32,8 +30,7 @@ internal class Program
         while (IsGameRunning)
         {
             // Gather user input
-            if (!InputManager.TakeInput(out Command? command, out string[] commandData) || command == null)
-                return;
+            Command? command = InputManager.TakeInput(out string[] commandData);
 
             // Process the input
             bool isRenderNeeded = ProcessInput(map, command, commandData);
@@ -44,9 +41,10 @@ internal class Program
         }
     }
 
-    private static bool ProcessInput(Map map, Command command, string[] commandData)
+    private static bool ProcessInput(Map map, Command? command, string[] commandData)
     {
-        // Execute the chosen command on the specified tile
-        return command.Execute(map, commandData);
+        // Execute the chosen command on the specified tile (if it is not null)
+        // and return the result of the command's execute method
+        return command == null || command.Execute(map, commandData);
     }
 }

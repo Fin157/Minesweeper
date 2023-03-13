@@ -5,7 +5,7 @@
 /// </summary>
 internal class MineTile : Tile
 {
-    public MineTile(int x, int y) : base(x, y) { }
+    public MineTile(int x, int y, bool isDarker) : base(x, y, isDarker) { }
 
     protected override void OnUncover()
     {
