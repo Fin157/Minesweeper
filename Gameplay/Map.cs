@@ -1,4 +1,7 @@
-﻿namespace Minesweeper.Gameplay;
+﻿using Minesweeper.Gameplay.TileSystem;
+using Minesweeper.Rendering;
+
+namespace Minesweeper.Gameplay;
 
 /// <summary>
 /// A class representing a game field consisting of tiles
@@ -26,10 +29,12 @@ internal class Map
     }
 
     private readonly Tile[,] tiles;
+    private readonly MapRenderer renderer;
 
     private Map(Tile[,] tiles)
     {
         this.tiles = tiles;
+        renderer = new(this);
     }
 
     /// <summary>
@@ -37,10 +42,12 @@ internal class Map
     /// </summary>
     /// <param name="pos">The position to be checked</param>
     /// <returns>True if the position fulfills the conditions, otherwise false</returns>
-    public bool IsPositionValid(Position pos)
-    {
-        return (pos.x >= 0 && pos.x < tiles.GetLength(1) && pos.y >= 0 && pos.y < tiles.GetLength(0));
-    }
+    public bool IsPositionValid(Position pos) => pos.x >= 0 && pos.x < tiles.GetLength(1) && pos.y >= 0 && pos.y < tiles.GetLength(0);
+
+    /// <summary>
+    /// Tells the renderer to fill the buffer with tile textures
+    /// </summary>
+    public void PrepareRender() => renderer.PrepareMapRender();
 
     #region Static map generation methods
     /// <summary>
