@@ -7,6 +7,9 @@ namespace Minesweeper.Input;
 /// </summary>
 internal static class InputManager
 {
+    /// <summary>
+    /// Remembers all the possible commands
+    /// </summary>
     public static readonly List<Command> CommandMappings = new()
     {
         new("HELP", "Lists all available commands.", CommandMethods.HelpCommand),
@@ -15,14 +18,20 @@ internal static class InputManager
         new("MARK", "Marks or unmarks the specified uncovered tile.", CommandMethods.MarkTileCommand, "tile X (integer)", "tile Y (integer)", "marked (true/false)")
     };
 
+    /// <summary>
+    /// Takes an input from the user and returns it as raw string data and a command to be executed
+    /// </summary>
+    /// <param name="commandData">An out parameter for the command data</param>
+    /// <returns>A command to be executed on the command data (can be null)</returns>
     public static Command? TakeInput(out string[] commandData)
     {
-        // Syntax of one user input line: /(type of command) [(tile x)] [(tile y)]
         commandData = Array.Empty<string>();
 
-        // Prevent receiving a null input
         Console.Write("/");
+
+        // Prevent receiving a null input
         string? input = Console.ReadLine();
+
         if (input == null)
             return null;
 
@@ -42,7 +51,7 @@ internal static class InputManager
             }
         }
 
-        splitInput.RemoveAt(0); // Remove the command type itself and keep just the command data
+        splitInput.RemoveAt(0); // Remove the command type itself from the string array and keep just the command data
         commandData = splitInput.ToArray();
 
         return command;
