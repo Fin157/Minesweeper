@@ -33,7 +33,7 @@ internal class Command
         Parameters = parameters;
     }
 
-    public override string ToString()
+    public string ToRenderLine()
     {
         string result = Name;
 

@@ -1,23 +1,28 @@
 ﻿namespace Minesweeper.Rendering;
 
 /// <summary>
-/// A renderer used by the whole game to render stuff at once at the end of every game loop cycle
+/// A renderer used by the whole game to render stuff at the right time
 /// </summary>
 internal static class BufferedRenderer
 {
+    public const ConsoleColor COLOUR_DEFAULT = ConsoleColor.Black;
+
     /// <summary>
     /// A queue where all the data to be rendered is stored
     /// </summary>
-    private static readonly Queue<RenderLine> renderQueue = new();
+    private static readonly Queue<RenderLine> mainQueue = new();
+    private static readonly Queue<RenderLine> additionalQueue = new();
 
     /// <summary>
-    /// Adds a render line to the render queue
+    /// Adds a render line to the main render queue
     /// </summary>
     /// <param name="line">A piece of data for the renderer</param>
-    public static void AddLine(RenderLine line)
-    {
-        renderQueue.Enqueue(line);
-    }
+    public static void AddToMain(RenderLine line) => mainQueue.Enqueue(line);
+    /// <summary>
+    /// Adds a render line to the additional queue
+    /// </summary>
+    /// <param name="line">A piece of data for the renderer</param>
+    public static void AddToAdditional(RenderLine line) => additionalQueue.Enqueue(line);
 
     /// <summary>
     /// Renders all the data currently waiting in the queue
@@ -26,18 +31,32 @@ internal static class BufferedRenderer
     {
         Console.Clear();
 
-        while (renderQueue.Count > 0)
+        // Render stuff from the main queue first
+        RenderQueue(mainQueue);
+
+        // Render stuff from the additional queue
+        RenderQueue(additionalQueue);
+    }
+
+    /// <summary>
+    /// Renders the specified queue
+    /// </summary>
+    /// <param name="queue">The queue to be rendered</param>
+    private static void RenderQueue(Queue<RenderLine> queue)
+    {
+        while (queue.Count > 0)
         {
-            RenderLine line = renderQueue.Dequeue();
-            for (int i = 0; i < line.chars.Length; i++)
+            RenderLine line = queue.Dequeue();
+            for (int i = 0; i < line.Length; i++)
             {
-                char c = line.chars[i];
-                ConsoleColor charColour = line.colours[i];
-                if (Console.BackgroundColor != charColour)
-                    Console.BackgroundColor = charColour;
-                Console.Write(c);
+                LineChunk lc = line[i];
+                if (Console.BackgroundColor != lc.colour)
+                    Console.BackgroundColor = lc.colour;
+                Console.Write(lc.c);
             }
             Console.WriteLine();
         }
+
+        Console.BackgroundColor = COLOUR_DEFAULT;
     }
 }

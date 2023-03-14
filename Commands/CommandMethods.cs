@@ -1,5 +1,6 @@
 ﻿using Minesweeper.Gameplay;
 using Minesweeper.Input;
+using Minesweeper.Rendering;
 
 namespace Minesweeper.Commands;
 
@@ -12,7 +13,7 @@ internal static class CommandMethods
     {
         // Show all the available command names, descriptions and parameters
         foreach (Command c in InputManager.CommandMappings)
-            Console.WriteLine(c.ToString());
+            BufferedRenderer.AddToAdditional(new(c.ToRenderLine()));
     }
 
     public static void LeaveGameCommand(Map map, string[] userInput)

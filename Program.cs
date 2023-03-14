@@ -30,24 +30,22 @@ internal class Program
 
         while (IsGameRunning)
         {
-            map.PrepareRender();
-
             // Gather user input
             Command? command = InputManager.TakeInput(out string[] commandData);
 
             // Process the input
-            bool isRenderNeeded = ProcessInput(map, command, commandData);
+            ProcessInput(map, command, commandData);
 
-            // Render the changes if needed
-            if (isRenderNeeded)
-                BufferedRenderer.Render();
+            // Render the changes
+            map.PrepareRender();
+            BufferedRenderer.Render();
         }
     }
 
-    private static bool ProcessInput(Map map, Command? command, string[] commandData)
+    private static void ProcessInput(Map map, Command? command, string[] commandData)
     {
         // Execute the chosen command on the specified tile (if it is not null)
         // and return the result of the command's execute method
-        return command == null || command.Execute(map, commandData);
+        command?.Execute(map, commandData);
     }
 }

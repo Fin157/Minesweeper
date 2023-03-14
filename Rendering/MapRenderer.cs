@@ -19,7 +19,7 @@ internal class MapRenderer
         for (int x = 0; x <= owner.LengthX; x++)
             headerRow.AppendWithDefaultColour(x % 2 != 0 ? x.ToString("00") : "  ");
 
-        BufferedRenderer.AddLine(headerRow);
+        BufferedRenderer.AddToMain(headerRow);
 
         // Render the map (data rows of the table)
         for (int y = 0; y < owner.LengthY; y++)
@@ -32,7 +32,7 @@ internal class MapRenderer
             for (int x = 0; x < owner.LengthX; x++)
                 row.Append(owner[x, y].Texture);
 
-            BufferedRenderer.AddLine(row);
+            BufferedRenderer.AddToMain(row);
         }
     }
 }
