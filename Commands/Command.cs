@@ -7,7 +7,7 @@ namespace Minesweeper.Commands;
 /// </summary>
 internal class Command
 {
-    public delegate bool ExecuteCommand(Map map, string[] userInput);
+    public delegate void ExecuteCommand(Map map, string[] userInput);
     /// <summary>
     /// The name of the command (the keyword used to access it)
     /// </summary>

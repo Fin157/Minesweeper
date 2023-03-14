@@ -8,43 +8,39 @@ namespace Minesweeper.Commands;
 /// </summary>
 internal static class CommandMethods
 {
-    public static bool HelpCommand(Map map, string[] userInput)
+    public static void HelpCommand(Map map, string[] userInput)
     {
         // Show all the available command names, descriptions and parameters
         foreach (Command c in InputManager.CommandMappings)
             Console.WriteLine(c.ToString());
-
-        return false;
     }
 
-    public static bool LeaveGameCommand(Map map, string[] userInput)
+    public static void LeaveGameCommand(Map map, string[] userInput)
     {
         // Stop the main loop
         Program.IsGameRunning = false;
-
-        return false;
     }
 
-    public static bool DigTileCommand(Map map, string[] userInput)
+    public static void DigTileCommand(Map map, string[] userInput)
     {
+        // Check if the input data is valid
         if (!Position.GetFromStrings(userInput[0], userInput[1], out Position pos) ||
             map[pos.x, pos.y].IsUncovered)
-            return true;
+            return;
 
+        // Change state of the target tile
         map[pos.x, pos.y].IsUncovered = true;
-
-        return true;
     }
 
-    public static bool MarkTileCommand(Map map, string[] userInput)
+    public static void MarkTileCommand(Map map, string[] userInput)
     {
+        // Check if the input data is valid
         if (userInput.Length < 3 ||
             !Position.GetFromStrings(userInput[0], userInput[1], out Position pos) ||
             map[pos.x, pos.y].IsUncovered)
-            return true;
+            return;
 
+        // Change state of the target tile
         map[pos.x, pos.y].IsMarked = Convert.ToBoolean(userInput[2]);
-
-        return true;
     }
 }
