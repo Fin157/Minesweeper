@@ -2,41 +2,37 @@
 
 namespace Minesweeper.Rendering;
 
-internal static class MapRenderer
+internal class MapRenderer
 {
-    public static void Render(Map map)
+    private readonly Map owner;
+
+    public MapRenderer(Map owner)
     {
-        Console.Clear();
+        this.owner = owner;
+    }
 
-        // Controls if the next tile is going to be drawn a lighter or darker variant to
-        // distinct neighbour tiles from each other
-        bool isDarker = false;
-
+    public void PrepareMapRender()
+    {
         // Render the first row of the table (header row)
-        for (int x = 0; x <= map.LengthX; x++)
-        {
-            string headerText = x % 2 != 0 ? x.ToString("00") : "  ";
-            Console.Write(headerText);
-        }
-        Console.WriteLine();
+        RenderLine headerRow = new();
+
+        for (int x = 0; x <= owner.LengthX; x++)
+            headerRow.AppendWithDefaultColour(x % 2 != 0 ? x.ToString("00") : "  ");
+
+        BufferedRenderer.AddLine(headerRow);
 
         // Render the map (data rows of the table)
-        for (int y = 0; y < map.LengthY; y++)
+        for (int y = 0; y < owner.LengthY; y++)
         {
-            string headerText = y % 2 == 0 ? (y + 1).ToString("00") : "  ";
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.Write(headerText);
+            RenderLine row = new();
+            // Add the row header
+            row.AppendWithDefaultColour(y % 2 == 0 ? (y + 1).ToString("00") : "  ");
 
-            for (int x = 0; x < map.LengthX; x++)
-            {
-                map[x, y].Render();
-                isDarker = !isDarker;
-            }
+            // Add the tile textures in this row
+            for (int x = 0; x < owner.LengthX; x++)
+                row.Append(owner[x, y].Texture);
 
-            Console.WriteLine();
-            isDarker = !isDarker;
+            BufferedRenderer.AddLine(row);
         }
-
-        Console.BackgroundColor = ConsoleColor.Black;
     }
 }

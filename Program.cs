@@ -25,10 +25,13 @@ internal class Program
     private static void GameLoop(Map map)
     {
         // Render the empty field
-        MapRenderer.Render(map);
+        map.PrepareRender();
+        BufferedRenderer.Render();
 
         while (IsGameRunning)
         {
+            map.PrepareRender();
+
             // Gather user input
             Command? command = InputManager.TakeInput(out string[] commandData);
 
@@ -37,7 +40,7 @@ internal class Program
 
             // Render the changes if needed
             if (isRenderNeeded)
-                MapRenderer.Render(map);
+                BufferedRenderer.Render();
         }
     }
 
