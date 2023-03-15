@@ -51,7 +51,7 @@ internal class Map
 
     #region Static map generation methods
     /// <summary>
-    /// Generates the game field and fills it with mines
+    /// Generates the game field, fills it with mines and exposes a small part of the map with "zero tiles"
     /// </summary>
     /// <param name="mapSizeX">The X size of the map</param>
     /// <param name="mapSizeY">The Y size of the map</param>
@@ -63,7 +63,8 @@ internal class Map
 
         // Populate the map with tiles
         List<Position> clearTiles = PlaceMines(map, mineCount);
-        CalculateClearTiles(map, clearTiles);
+        HashSet<Position> zeroTiles = CalculateClearTiles(map, clearTiles);
+        ExposeBiggestZeroChunk(zeroTiles);
 
         return map;
     }
@@ -105,7 +106,7 @@ internal class Map
     /// </summary>
     /// <param name="map">The map to be worked with</param>
     /// <param name="clearTiles">All the tiles that aren't mines and have to be checked</param>
-    private static void CalculateClearTiles(Map map, List<Position> clearTiles)
+    private static HashSet<Position> CalculateClearTiles(Map map, List<Position> clearTiles)
     {
         // An array of positions considered to be neighbours
         Position[] neighboursRelative =
@@ -120,12 +121,13 @@ internal class Map
                 new(-1, 0)
         };
 
-        HashSet<Position> positionsToUpdate = new();
+        HashSet<Position> zeroTiles = new();
 
         // Loop through the whole map
         foreach (Position pos in clearTiles)
         {
             int minesAround = 0;
+            ZeroChunk? chunk = null;
 
             List<Position> neighboursAbsolute = new();
 
@@ -133,10 +135,21 @@ internal class Map
             foreach (Position n in neighboursRelative)
             {
                 Position neighbourAbsolute = pos.Combine(n);
-                if (map.IsPositionValid(neighbourAbsolute) && map[neighbourAbsolute.x, neighbourAbsolute.y] is MineTile)
+                if (map.IsPositionValid(neighbourAbsolute))
                 {
                     neighboursAbsolute.Add(n);
-                    minesAround++;
+                    Tile neighbourTile = map[neighbourAbsolute.x, neighbourAbsolute.y];
+                    switch (neighbourTile.GetType().Name)
+                    {
+                        case nameof(MineTile):
+                            minesAround++;
+                            break;
+                        case nameof(ClearTile):
+                            ZeroChunk? neighbourChunk = (neighbourTile as ClearTile).Chunk;
+                            if (neighbourChunk != null)
+                                chunk = neighbourChunk;
+                            break;
+                    }
                 }
             }
 
@@ -144,8 +157,21 @@ internal class Map
             map[pos.x, pos.y] = new ClearTile(pos.x, pos.y, IsDarker(pos), minesAround);
 
             if (minesAround == 0)
-                map[pos.x, pos.y].IsUncovered = true;
+                zeroTiles.Add(pos);
         }
+
+        return zeroTiles;
+    }
+
+    /// <summary>
+    /// Looks at the hash set of clear tiles which don't neighbour any mine tile, finds the largest continuous
+    /// chunk of them and exposes that chunk and all the tiles exactly around it
+    /// </summary>
+    /// <param name="zeroTiles">All the zero tiles on the map</param>
+    private static void ExposeBiggestZeroChunk(HashSet<Position> zeroTiles)
+    {
+        // Look at the first tile in the hash set
+        // Find out if any of the 
     }
 
     /// <summary>

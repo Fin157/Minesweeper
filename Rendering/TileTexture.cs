@@ -47,7 +47,7 @@ internal class TileTexture
 
                 renderText = owner.GetType().Name switch
                 {
-                    nameof(ClearTile) => (owner as ClearTile).MinesAround.ToString("00"),
+                    nameof(ClearTile) => (owner as ClearTile).MinesAround != 0 ? (owner as ClearTile).MinesAround.ToString("00") : "  ",
                     _ => "  "
                 };
             }

@@ -25,8 +25,7 @@ internal class Program
     private static void GameLoop(Map map)
     {
         // Render the empty field
-        map.PrepareRender();
-        BufferedRenderer.Render();
+        Render();
 
         while (IsGameRunning)
         {
@@ -37,8 +36,7 @@ internal class Program
             ProcessInput(map, command, commandData);
 
             // Render the changes
-            map.PrepareRender();
-            BufferedRenderer.Render();
+            Render();
         }
     }
 
@@ -47,5 +45,13 @@ internal class Program
         // Execute the chosen command on the specified tile (if it is not null)
         // and return the result of the command's execute method
         command?.Execute(map, commandData);
+    }
+
+    private static void Render()
+    {
+        // Fill the main buffer with tile textures
+        map.PrepareRender();
+
+        BufferedRenderer.Render();
     }
 }

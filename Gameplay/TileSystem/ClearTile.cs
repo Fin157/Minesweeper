@@ -16,6 +16,7 @@ internal class ClearTile : Tile
             return isUncovered ? minesAround : -1;
         }
     }
+    public ZeroChunk? Chunk { get; init; }
 
     /// <summary>
     /// Stores how many mines this tile neighbours
