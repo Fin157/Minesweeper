@@ -30,11 +30,13 @@ internal class Map
 
     private readonly Tile[,] tiles;
     private readonly MapRenderer renderer;
+    private readonly List<ZeroChunk> zeroChunks;
 
-    private Map(Tile[,] tiles)
+    private Map(int sizeX, int sizeY)
     {
-        this.tiles = tiles;
+        tiles = new Tile[sizeX, sizeY];
         renderer = new(this);
+        zeroChunks = new();
     }
 
     /// <summary>
@@ -59,14 +61,31 @@ internal class Map
     /// <returns>The newly generated map</returns>
     public static Map GenerateMap(int mapSizeX, int mapSizeY, int mineCount)
     {
-        Map map = new(new Tile[mapSizeX, mapSizeY]);
+        Map map = new(mapSizeX, mapSizeY);
 
         // Populate the map with tiles
-        List<Position> clearTiles = PlaceMines(map, mineCount);
-        HashSet<Position> zeroTiles = CalculateClearTiles(map, clearTiles);
-        ExposeBiggestZeroChunk(zeroTiles);
+        List<Position> available = InitMap(map);
+        List<Position> clearTiles = PlaceMines(map, available, mineCount);
+        CalculateClearTiles(map, clearTiles);
+        ExposeLargestChunk(map.zeroChunks);
 
         return map;
+    }
+
+    private static List<Position> InitMap(Map map)
+    {
+        List<Position> available = new();
+
+        for (int y = 0; y < map.LengthY; y++)
+        {
+            for (int x = 0; x < map.LengthX; x++)
+            {
+                available.Add(new(x, y));
+                map[x, y] = new ClearTile(x, y, IsDarker(new(x, y)));
+            }
+        }
+
+        return available;
     }
 
     /// <summary>
@@ -75,14 +94,8 @@ internal class Map
     /// <param name="map">The map to be worked with</param>
     /// <param name="mineCount">How many mines we want to be placed</param>
     /// <returns>All positions without mines</returns>
-    private static List<Position> PlaceMines(Map map, int mineCount)
+    private static List<Position> PlaceMines(Map map, List<Position> available, int mineCount)
     {
-        // Prepare a list of all the positions where a mine can be placed
-        // Initially stores all the positions of the map
-        List<Position> available = new();
-        for (int y = 0; y < map.LengthY; y++)
-            for (int x = 0; x < map.LengthX; x++)
-                available.Add(new(x, y));
         Random r = new();
 
         // Fill the map randomly with the specified number of mines
@@ -106,9 +119,9 @@ internal class Map
     /// </summary>
     /// <param name="map">The map to be worked with</param>
     /// <param name="clearTiles">All the tiles that aren't mines and have to be checked</param>
-    private static HashSet<Position> CalculateClearTiles(Map map, List<Position> clearTiles)
+    private static void CalculateClearTiles(Map map, List<Position> clearTiles)
     {
-        // An array of positions considered to be neighbours
+        // An array of positions considered to be neighbours to a tile (relative positions to it)
         Position[] neighboursRelative =
         {
                 new(-1, -1),
@@ -121,14 +134,11 @@ internal class Map
                 new(-1, 0)
         };
 
-        HashSet<Position> zeroTiles = new();
-
         // Loop through the whole map
         foreach (Position pos in clearTiles)
         {
             int minesAround = 0;
             ZeroChunk? chunk = null;
-
             List<Position> neighboursAbsolute = new();
 
             // Check all the surrounding positions for mines
@@ -137,41 +147,60 @@ internal class Map
                 Position neighbourAbsolute = pos.Combine(n);
                 if (map.IsPositionValid(neighbourAbsolute))
                 {
-                    neighboursAbsolute.Add(n);
+                    neighboursAbsolute.Add(neighbourAbsolute);
                     Tile neighbourTile = map[neighbourAbsolute.x, neighbourAbsolute.y];
-                    switch (neighbourTile.GetType().Name)
+
+                    if (neighbourTile is MineTile)
+                        minesAround++;
+                    else if (neighbourTile is ClearTile)
                     {
-                        case nameof(MineTile):
-                            minesAround++;
-                            break;
-                        case nameof(ClearTile):
-                            ZeroChunk? neighbourChunk = (neighbourTile as ClearTile).Chunk;
-                            if (neighbourChunk != null)
-                                chunk = neighbourChunk;
-                            break;
+                        ZeroChunk? neighbourChunk = (neighbourTile as ClearTile)?.Chunk;
+                        if (neighbourChunk != null)
+                            chunk = neighbourChunk;
                     }
                 }
             }
 
-            // Place the clear tile
-            map[pos.x, pos.y] = new ClearTile(pos.x, pos.y, IsDarker(pos), minesAround);
+            // Update the clear tile
+            (map[pos.x, pos.y] as ClearTile).MinesAround = minesAround;
+
+            // Check if this tile is a zero tile (DONE)
+            // If it is, find out if any neighbouring tile belongs to a zero chunk
+            // If not, create a new chunk and put this tile into it
+            // If yes, adopt that zero chunk
+            // Expand the zero chunk to neighbouring tiles as well
 
             if (minesAround == 0)
-                zeroTiles.Add(pos);
-        }
+            {
+                if (chunk == null)
+                {
+                    chunk = new();
+                    map.zeroChunks.Add(chunk);
+                }
 
-        return zeroTiles;
+                chunk.AddTile(map[pos.x, pos.y]);
+
+                foreach (Position n in neighboursAbsolute)
+                    chunk.AddTile(map[n.x, n.y]);
+            }
+        }
     }
 
-    /// <summary>
-    /// Looks at the hash set of clear tiles which don't neighbour any mine tile, finds the largest continuous
-    /// chunk of them and exposes that chunk and all the tiles exactly around it
-    /// </summary>
-    /// <param name="zeroTiles">All the zero tiles on the map</param>
-    private static void ExposeBiggestZeroChunk(HashSet<Position> zeroTiles)
+    private static void ExposeLargestChunk(List<ZeroChunk> zeroChunks)
     {
-        // Look at the first tile in the hash set
-        // Find out if any of the 
+        int currentLargest = 0;
+        ZeroChunk? current = null;
+
+        foreach (ZeroChunk c in zeroChunks)
+        {
+            if (c.Size > currentLargest)
+            {
+                currentLargest = c.Size;
+                current = c;
+            }
+        }
+
+        current?.Expose();
     }
 
     /// <summary>

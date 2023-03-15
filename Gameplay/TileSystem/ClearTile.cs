@@ -15,18 +15,29 @@ internal class ClearTile : Tile
         {
             return isUncovered ? minesAround : -1;
         }
+        set
+        {
+            if (!wasMinesAroundSet)
+            {
+                wasMinesAroundSet = true;
+                minesAround = value;
+            }
+        }
     }
-    public ZeroChunk? Chunk { get; init; }
+    public ZeroChunk? Chunk { get; set; }
 
     /// <summary>
     /// Stores how many mines this tile neighbours
     /// </summary>
-    private readonly int minesAround;
+    private int minesAround;
+    private bool wasMinesAroundSet = false;
 
     public ClearTile(int x, int y, bool isDarker, int minesAround) : base(x, y, isDarker)
     {
         this.minesAround = minesAround;
     }
+
+    public ClearTile(int x, int y, bool isDarker) : base(x, y, isDarker) { }
 
     protected override void OnUncover()
     {

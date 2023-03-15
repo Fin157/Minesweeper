@@ -17,13 +17,15 @@ internal class Program
 
     private static void Main(string[] args)
     {
-        // Initiate the game loop
-        IsGameRunning = true;
+        // Enter the main loop method
         GameLoop(map);
     }
 
     private static void GameLoop(Map map)
     {
+        // Start the loop
+        IsGameRunning = true;
+
         // Render the empty field
         Render();
 

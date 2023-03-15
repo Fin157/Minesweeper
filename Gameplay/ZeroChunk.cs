@@ -1,18 +1,33 @@
-﻿namespace Minesweeper.Gameplay;
+﻿using Minesweeper.Gameplay.TileSystem;
+
+namespace Minesweeper.Gameplay;
 
 internal class ZeroChunk
 {
     /// <summary>
-    /// All the tile positions
-    /// </summary>
-    public Position[] Positions { get; init; }
-    /// <summary>
     /// How many tiles fall into this zero chunk
     /// </summary>
-    public int Size { get => Positions.Length; }
+    public int Size { get => tiles.Count; }
 
-    public ZeroChunk(Position[] positions)
+    /// <summary>
+    /// All the tile positions
+    /// </summary>
+    private readonly List<Tile> tiles;
+
+    public ZeroChunk()
     {
-        Positions = positions;
+        tiles = new();
+    }
+
+    public void AddTile(Tile t)
+    {
+        tiles.Add(t);
+        (t as ClearTile).Chunk = this;
+    }
+
+    public void Expose()
+    {
+        foreach (Tile t in tiles)
+            t.IsUncovered = true;
     }
 }
