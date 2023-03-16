@@ -1,23 +1,21 @@
 ﻿using Minesweeper.Commands;
-using Minesweeper.Gameplay;
 using Minesweeper.Input;
 using Minesweeper.Rendering;
 
-namespace Minesweeper;
+namespace Minesweeper.Gameplay;
 
-internal class Program
+internal static class Game
 {
-    private const int MAP_SIZE_X = 20;
-    private const int MAP_SIZE_Y = 20;
-    private const int MINE_COUNT = 100;
+    private const int MAP_SIZE_X = 5;
+    private const int MAP_SIZE_Y = 5;
+    private const int MINE_COUNT = 1;
 
     public static bool IsGameRunning { get; set; }
 
-    private static readonly Map map = Map.GenerateMap(MAP_SIZE_X, MAP_SIZE_Y, MINE_COUNT);
+    public static readonly Map map = Map.GenerateMap(MAP_SIZE_X, MAP_SIZE_Y, MINE_COUNT);
 
-    private static void Main(string[] args)
+    public static void StartGame()
     {
-        // Enter the main loop method
         GameLoop(map);
     }
 
@@ -29,7 +27,7 @@ internal class Program
         // Render the empty field
         Render();
 
-        while (IsGameRunning)
+        while (IsGameRunning && !map.IsMapClear)
         {
             // Gather user input
             Command? command = InputManager.TakeInput(out string[] commandData);
@@ -40,6 +38,8 @@ internal class Program
             // Render the changes
             Render();
         }
+
+        GameEnd();
     }
 
     private static void ProcessInput(Map map, Command? command, string[] commandData)
@@ -55,5 +55,14 @@ internal class Program
         map.PrepareRender();
 
         BufferedRenderer.Render();
+    }
+
+    private static void GameEnd()
+    {
+        // The game didn't end violently (the player won)
+        if (map.IsMapClear)
+            BufferedRenderer.AddToAdditional(new("You win!"));
+
+        Render();
     }
 }

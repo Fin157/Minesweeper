@@ -24,19 +24,19 @@ internal class Map
     /// <returns>A tile to use in read/write operations</returns>
     public Tile this[int x, int y]
     {
-        get => tiles[x, y];
-        set => tiles[x, y] = value;
+        get => tiles[y, x];
+        set => tiles[y, x] = value;
     }
+    public bool IsMapClear { get => DigsLeft == 0; }
+    public int DigsLeft { get; set; }
 
     private readonly Tile[,] tiles;
     private readonly MapRenderer renderer;
-    private readonly List<ZeroChunk> zeroChunks;
 
     private Map(int sizeX, int sizeY)
     {
-        tiles = new Tile[sizeX, sizeY];
+        tiles = new Tile[sizeY, sizeX];
         renderer = new(this);
-        zeroChunks = new();
     }
 
     /// <summary>
@@ -66,8 +66,9 @@ internal class Map
         // Populate the map with tiles
         List<Position> available = InitMap(map);
         List<Position> clearTiles = PlaceMines(map, available, mineCount);
-        CalculateClearTiles(map, clearTiles);
-        ExposeLargestChunk(map.zeroChunks);
+        List<ZeroChunk> zeroChunks = CalculateClearTiles(map, clearTiles);
+        int initialVisibleSize = ExposeLargestChunk(zeroChunks);
+        map.DigsLeft = mapSizeX * mapSizeY - mineCount - initialVisibleSize;
 
         return map;
     }
@@ -81,7 +82,7 @@ internal class Map
             for (int x = 0; x < map.LengthX; x++)
             {
                 available.Add(new(x, y));
-                map[x, y] = new ClearTile(x, y, IsDarker(new(x, y)));
+                map[x, y] = new ClearTile(x, y, IsDarker(new(x, y)), map);
             }
         }
 
@@ -106,7 +107,7 @@ internal class Map
 
             // Consume the position (remove it from the list)
             Position minePos = available[posIndex];
-            map[minePos.x, minePos.y] = new MineTile(minePos.x, minePos.y, IsDarker(minePos));
+            map[minePos.x, minePos.y] = new MineTile(minePos.x, minePos.y, IsDarker(minePos), map);
 
             available.RemoveAt(posIndex);
         }
@@ -119,8 +120,9 @@ internal class Map
     /// </summary>
     /// <param name="map">The map to be worked with</param>
     /// <param name="clearTiles">All the tiles that aren't mines and have to be checked</param>
-    private static void CalculateClearTiles(Map map, List<Position> clearTiles)
+    private static List<ZeroChunk> CalculateClearTiles(Map map, List<Position> clearTiles)
     {
+        List<ZeroChunk> zeroChunks = new();
         // An array of positions considered to be neighbours to a tile (relative positions to it)
         Position[] neighboursRelative =
         {
@@ -175,7 +177,7 @@ internal class Map
                 if (chunk == null)
                 {
                     chunk = new();
-                    map.zeroChunks.Add(chunk);
+                    zeroChunks.Add(chunk);
                 }
 
                 chunk.AddTile(map[pos.x, pos.y]);
@@ -184,9 +186,11 @@ internal class Map
                     chunk.AddTile(map[n.x, n.y]);
             }
         }
+
+        return zeroChunks;
     }
 
-    private static void ExposeLargestChunk(List<ZeroChunk> zeroChunks)
+    private static int ExposeLargestChunk(List<ZeroChunk> zeroChunks)
     {
         int currentLargest = 0;
         ZeroChunk? current = null;
@@ -201,6 +205,8 @@ internal class Map
         }
 
         current?.Expose();
+
+        return current == null ? 0 : current.Size;
     }
 
     /// <summary>

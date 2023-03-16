@@ -12,7 +12,8 @@ internal class ZeroChunk
     /// <summary>
     /// All the tile positions
     /// </summary>
-    private readonly List<Tile> tiles;
+    private readonly HashSet<Tile> tiles;
+    private bool isExposed = false;
 
     public ZeroChunk()
     {
@@ -27,7 +28,12 @@ internal class ZeroChunk
 
     public void Expose()
     {
-        foreach (Tile t in tiles)
-            t.IsUncovered = true;
+        if (!isExposed)
+        {
+            isExposed = true;
+
+            foreach (Tile t in tiles)
+                t.IsUncovered = true;
+        }
     }
 }

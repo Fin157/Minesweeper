@@ -60,5 +60,10 @@
             axis = int.TryParse(s, out int pos) ? pos : -1;
             return axis != -1;
         }
+
+        public override string ToString()
+        {
+            return $"[{x};{y}]";
+        }
     }
 }

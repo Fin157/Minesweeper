@@ -53,13 +53,15 @@ internal abstract class Tile
     protected bool isUncovered;
     protected bool isMarked;
     protected TileTexture renderer;
+    protected Map parent;
 
-    public Tile(int x, int y, bool isDarker)
+    public Tile(int x, int y, bool isDarker, Map parent)
     {
         IsMarked = false;
         IsUncovered = false;
         Position = new(x, y);
         renderer = new(this, isDarker);
+        this.parent = parent;
     }
 
     /// <summary>

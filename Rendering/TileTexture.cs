@@ -22,7 +22,9 @@ internal class TileTexture
     {
         ["regular"] = new(ConsoleColor.Green, ConsoleColor.DarkGreen),
         ["marked"] = new(ConsoleColor.Red, ConsoleColor.DarkRed),
-        ["uncovered"] = new(ConsoleColor.Blue, ConsoleColor.DarkBlue)
+        ["uncovered"] = new(ConsoleColor.Blue, ConsoleColor.DarkBlue),
+        ["mine"] = new(ConsoleColor.Yellow, ConsoleColor.DarkYellow),
+        ["default"] = new(ConsoleColor.Gray, ConsoleColor.Black)
     };
 
     public TileTexture(Tile owner, bool isDarker)
@@ -43,13 +45,21 @@ internal class TileTexture
 
             if (owner.IsUncovered)
             {
-                tileColour = tileColours["uncovered"];
-
-                renderText = owner.GetType().Name switch
+                switch (owner.GetType().Name)
                 {
-                    nameof(ClearTile) => (owner as ClearTile).MinesAround != 0 ? (owner as ClearTile).MinesAround.ToString("00") : "  ",
-                    _ => "  "
-                };
+                    case nameof(ClearTile):
+                        tileColour = tileColours["uncovered"];
+                        ClearTile t = (ClearTile)owner;
+                        if (t.MinesAround != 0)
+                            renderText = t.MinesAround.ToString("00");
+                        break;
+                    case nameof(MineTile):
+                        tileColour = tileColours["mine"];
+                        break;
+                    default:
+                        tileColour = tileColours["default"];
+                        break;
+                }
             }
             else
                 tileColour = owner.IsMarked ? tileColours["marked"] : tileColours["regular"];

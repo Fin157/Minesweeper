@@ -32,15 +32,17 @@ internal class ClearTile : Tile
     private int minesAround;
     private bool wasMinesAroundSet = false;
 
-    public ClearTile(int x, int y, bool isDarker, int minesAround) : base(x, y, isDarker)
+    public ClearTile(int x, int y, bool isDarker, int minesAround, Map parent) : base(x, y, isDarker, parent)
     {
         this.minesAround = minesAround;
     }
 
-    public ClearTile(int x, int y, bool isDarker) : base(x, y, isDarker) { }
+    public ClearTile(int x, int y, bool isDarker, Map parent) : base(x, y, isDarker, parent) { }
 
     protected override void OnUncover()
     {
-        // Do nothing, this tile is inert
+        // Trigger the mass expose if this tile belonged to a chunk
+        parent.DigsLeft--;
+        Chunk?.Expose();
     }
 }
