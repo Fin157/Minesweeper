@@ -56,7 +56,7 @@ internal static class Game
     private static void Render()
     {
         // Fill the main buffer with tile textures
-        map.PrepareRender(IsDebugOn);
+        map.RenderMap(IsDebugOn);
 
         BufferedRenderer.Render();
     }

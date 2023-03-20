@@ -1,6 +1,5 @@
 ﻿using Minesweeper.Gameplay.TileSystem;
 using Minesweeper.Rendering;
-using System.Runtime.CompilerServices;
 
 namespace Minesweeper.Gameplay;
 
@@ -28,6 +27,9 @@ internal class Map
         get => tiles[y, x];
         set => tiles[y, x] = value;
     }
+    /// <summary>
+    /// Returns true if digs the user has to do yet equals 0, otherwise false
+    /// </summary>
     public bool IsMapClear { get => digsLeft == 0; }
 
     private int digsLeft;
@@ -46,10 +48,7 @@ internal class Map
         zeroChunks = new();
     }
 
-    public void DecreaseDigsLeft()
-    {
-        digsLeft--;
-    }
+    public void DecreaseDigsLeft() => digsLeft--;
 
     /// <summary>
     /// Checks if the input position is inside the map
@@ -61,7 +60,7 @@ internal class Map
     /// <summary>
     /// Tells the renderer to fill the buffer with tile textures
     /// </summary>
-    public void PrepareRender(bool isDebug) => renderer.PrepareMapRender(isDebug);
+    public void RenderMap(bool isDebug) => renderer.Render(isDebug);
 
     #region Static map generation methods
     /// <summary>

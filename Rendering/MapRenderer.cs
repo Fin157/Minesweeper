@@ -11,7 +11,7 @@ internal class MapRenderer
         this.owner = owner;
     }
 
-    public void PrepareMapRender(bool isDebug)
+    public void Render(bool isDebug)
     {
         // Render the first row of the table (header row)
         RenderLine headerRow = new();
