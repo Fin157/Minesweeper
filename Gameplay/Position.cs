@@ -63,7 +63,7 @@
 
         public override string ToString()
         {
-            return $"[{x};{y}]";
+            return $"[{x + 1};{y + 1}]";
         }
     }
 }

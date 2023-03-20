@@ -18,11 +18,13 @@ internal static class BufferedRenderer
     /// </summary>
     /// <param name="line">A piece of data for the renderer</param>
     public static void AddToMain(RenderLine line) => mainQueue.Enqueue(line);
+    public static void AddToMain(string text) => mainQueue.Enqueue(new(text));
     /// <summary>
     /// Adds a render line to the additional queue
     /// </summary>
     /// <param name="line">A piece of data for the renderer</param>
     public static void AddToAdditional(RenderLine line) => additionalQueue.Enqueue(line);
+    public static void AddToAdditional(string text) => additionalQueue.Enqueue(new(text));
 
     /// <summary>
     /// Renders all the data currently waiting in the queue

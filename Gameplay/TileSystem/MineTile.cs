@@ -14,8 +14,8 @@ internal class MineTile : Tile
         // This is game over, the player tried to dig up a mine and exploded
         // Let the game loop know
 
-        BufferedRenderer.AddToAdditional(new("Oh no! You exploded!"));
+        BufferedRenderer.AddToAdditional("Oh no! You exploded!");
 
-        Game.IsGameRunning = false;
+        Game.IsLoopAlive = false;
     }
 }

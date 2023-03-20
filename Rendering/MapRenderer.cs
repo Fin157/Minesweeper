@@ -11,7 +11,7 @@ internal class MapRenderer
         this.owner = owner;
     }
 
-    public void PrepareMapRender()
+    public void PrepareMapRender(bool isDebug)
     {
         // Render the first row of the table (header row)
         RenderLine headerRow = new();
@@ -30,7 +30,7 @@ internal class MapRenderer
 
             // Add the tile textures in this row
             for (int x = 0; x < owner.LengthX; x++)
-                row.Append(owner[x, y].Texture);
+                row.Append(owner[x, y].GetTexture(isDebug));
 
             BufferedRenderer.AddToMain(row);
         }

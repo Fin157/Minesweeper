@@ -6,11 +6,15 @@ namespace Minesweeper.Gameplay;
 
 internal static class Game
 {
-    private const int MAP_SIZE_X = 5;
-    private const int MAP_SIZE_Y = 5;
-    private const int MINE_COUNT = 1;
+    private const int MAP_SIZE_X = 6;
+    private const int MAP_SIZE_Y = 12;
+    private const int MINE_COUNT = 10;
 
-    public static bool IsGameRunning { get; set; }
+    /// <summary>
+    /// Controls if this game class' main loop is running
+    /// </summary>
+    public static bool IsLoopAlive { get; set; }
+    public static bool IsDebugOn { get; set; } = false;
 
     public static readonly Map map = Map.GenerateMap(MAP_SIZE_X, MAP_SIZE_Y, MINE_COUNT);
 
@@ -22,12 +26,12 @@ internal static class Game
     private static void GameLoop(Map map)
     {
         // Start the loop
-        IsGameRunning = true;
+        IsLoopAlive = true;
 
         // Render the empty field
         Render();
 
-        while (IsGameRunning && !map.IsMapClear)
+        while (IsGameRunning())
         {
             // Gather user input
             Command? command = InputManager.TakeInput(out string[] commandData);
@@ -52,16 +56,22 @@ internal static class Game
     private static void Render()
     {
         // Fill the main buffer with tile textures
-        map.PrepareRender();
+        map.PrepareRender(IsDebugOn);
 
         BufferedRenderer.Render();
     }
+
+    /// <summary>
+    /// Checks if all the boolean values game state depends on and outputs the result of the calculation
+    /// </summary>
+    /// <returns>True if the game should be running, otherwise false</returns>
+    public static bool IsGameRunning() => IsLoopAlive && !map.IsMapClear;
 
     private static void GameEnd()
     {
         // The game didn't end violently (the player won)
         if (map.IsMapClear)
-            BufferedRenderer.AddToAdditional(new("You win!"));
+            BufferedRenderer.AddToAdditional("You win!");
 
         Render();
     }

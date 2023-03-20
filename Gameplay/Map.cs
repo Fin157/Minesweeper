@@ -1,5 +1,6 @@
 ﻿using Minesweeper.Gameplay.TileSystem;
 using Minesweeper.Rendering;
+using System.Runtime.CompilerServices;
 
 namespace Minesweeper.Gameplay;
 
@@ -27,16 +28,27 @@ internal class Map
         get => tiles[y, x];
         set => tiles[y, x] = value;
     }
-    public bool IsMapClear { get => DigsLeft == 0; }
-    public int DigsLeft { get; set; }
+    public bool IsMapClear { get => digsLeft == 0; }
 
+    private int digsLeft;
     private readonly Tile[,] tiles;
     private readonly MapRenderer renderer;
+
+
+    // TEMPORARY!!!
+    private List<ZeroChunk> zeroChunks;
+
 
     private Map(int sizeX, int sizeY)
     {
         tiles = new Tile[sizeY, sizeX];
         renderer = new(this);
+        zeroChunks = new();
+    }
+
+    public void DecreaseDigsLeft()
+    {
+        digsLeft--;
     }
 
     /// <summary>
@@ -49,7 +61,7 @@ internal class Map
     /// <summary>
     /// Tells the renderer to fill the buffer with tile textures
     /// </summary>
-    public void PrepareRender() => renderer.PrepareMapRender();
+    public void PrepareRender(bool isDebug) => renderer.PrepareMapRender(isDebug);
 
     #region Static map generation methods
     /// <summary>
@@ -67,8 +79,9 @@ internal class Map
         List<Position> available = InitMap(map);
         List<Position> clearTiles = PlaceMines(map, available, mineCount);
         List<ZeroChunk> zeroChunks = CalculateClearTiles(map, clearTiles);
+        map.zeroChunks = zeroChunks;
         int initialVisibleSize = ExposeLargestChunk(zeroChunks);
-        map.DigsLeft = mapSizeX * mapSizeY - mineCount - initialVisibleSize;
+        map.digsLeft = mapSizeX * mapSizeY - mineCount - initialVisibleSize;
 
         return map;
     }
@@ -144,9 +157,9 @@ internal class Map
             List<Position> neighboursAbsolute = new();
 
             // Check all the surrounding positions for mines
-            foreach (Position n in neighboursRelative)
+            foreach (Position neighbourRelative in neighboursRelative)
             {
-                Position neighbourAbsolute = pos.Combine(n);
+                Position neighbourAbsolute = pos.Combine(neighbourRelative);
                 if (map.IsPositionValid(neighbourAbsolute))
                 {
                     neighboursAbsolute.Add(neighbourAbsolute);
@@ -163,25 +176,23 @@ internal class Map
                 }
             }
 
-            // Update the clear tile
-            (map[pos.x, pos.y] as ClearTile).MinesAround = minesAround;
+            // Update the clear tile (it must be a clear tile so we can just plainly retype it without checking for null)
+            ((ClearTile)map[pos.x, pos.y]).MinesAround = minesAround;
 
-            // Check if this tile is a zero tile (DONE)
-            // If it is, find out if any neighbouring tile belongs to a zero chunk
-            // If not, create a new chunk and put this tile into it
-            // If yes, adopt that zero chunk
-            // Expand the zero chunk to neighbouring tiles as well
-
+            // Check if this tile is a zero tile
             if (minesAround == 0)
             {
+                // Choose a zero chunk where this tile will belong - either a new one or one from any of its zero tile neighbours
                 if (chunk == null)
                 {
                     chunk = new();
                     zeroChunks.Add(chunk);
                 }
 
+                // Add this tile to the zero chunk
                 chunk.AddTile(map[pos.x, pos.y]);
 
+                // Add all its neighbours to the zero chunk as well
                 foreach (Position n in neighboursAbsolute)
                     chunk.AddTile(map[n.x, n.y]);
             }

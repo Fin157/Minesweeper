@@ -15,7 +15,8 @@ internal static class InputManager
         new("HELP", "Lists all available commands.", CommandMethods.HelpCommand),
         new("QUIT", "Quits game.", CommandMethods.LeaveGameCommand),
         new("DIG", "Digs up the specified covered tile.", CommandMethods.DigTileCommand, "tile X (integer)", "tile Y (integer)"),
-        new("MARK", "Marks or unmarks the specified uncovered tile.", CommandMethods.MarkTileCommand, "tile X (integer)", "tile Y (integer)", "marked (true/false)")
+        new("MARK", "Marks or unmarks the specified uncovered tile.", CommandMethods.MarkTileCommand, "tile X (integer)", "tile Y (integer)", "marked (true/false)"),
+        new("DBUG", "Toggles debug view on or off.", CommandMethods.ToggleDebugCommand, "debug on (true/false)")
     };
 
     /// <summary>

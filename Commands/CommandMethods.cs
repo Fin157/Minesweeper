@@ -13,15 +13,15 @@ internal static class CommandMethods
     {
         // Show all the available command names, descriptions and parameters
         foreach (Command c in InputManager.CommandMappings)
-            BufferedRenderer.AddToAdditional(new(c.ToString()));
+            BufferedRenderer.AddToAdditional(c.ToString());
     }
 
     public static void LeaveGameCommand(Map map, string[] userInput)
     {
-        BufferedRenderer.AddToAdditional(new("Quitting game..."));
+        BufferedRenderer.AddToAdditional("Quitting game...");
 
         // Stop the main loop
-        Game.IsGameRunning = false;
+        Game.IsLoopAlive = false;
     }
 
     public static void DigTileCommand(Map map, string[] userInput)
@@ -31,7 +31,7 @@ internal static class CommandMethods
             map[pos.x, pos.y].IsUncovered)
             return;
 
-        BufferedRenderer.AddToAdditional(new("Digging up a tile on " + pos.ToString()));
+        BufferedRenderer.AddToAdditional("Digging up a tile on " + pos.ToString());
 
         // Change state of the target tile
         map[pos.x, pos.y].IsUncovered = true;
@@ -52,9 +52,24 @@ internal static class CommandMethods
         }
         catch { }
         string promptPrefix = newMarked ? "Marked" : "Unmarked";
-        BufferedRenderer.AddToAdditional(new(promptPrefix + " a tile on " + pos.ToString()));
+        BufferedRenderer.AddToAdditional(promptPrefix + " a tile on " + pos.ToString());
 
         // Change state of the target tile
         map[pos.x, pos.y].IsMarked = newMarked;
+    }
+
+    public static void ToggleDebugCommand(Map map, string[] userInput)
+    {
+        if (userInput.Length == 0)
+            return;
+
+        bool newDebugOn = false;
+        try
+        {
+            newDebugOn = Convert.ToBoolean(userInput[2]);
+        }
+        catch { }
+
+        Game.IsDebugOn = newDebugOn;
     }
 }

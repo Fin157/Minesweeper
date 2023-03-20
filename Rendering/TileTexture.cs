@@ -1,4 +1,5 @@
-﻿using Minesweeper.Gameplay.TileSystem;
+﻿using Minesweeper.Gameplay;
+using Minesweeper.Gameplay.TileSystem;
 
 namespace Minesweeper.Rendering;
 
@@ -36,37 +37,36 @@ internal class TileTexture
     /// <summary>
     /// Returns a render line that represents how the owner tile physically looks when rendered
     /// </summary>
-    public RenderLine Texture
+    public RenderLine GetTexture(bool isDebug)
     {
-        get
+        string renderText = "  ";
+        TileColour tileColour;
+
+        if (!Game.IsGameRunning() && owner is MineTile)
+            tileColour = tileColours["mine"];
+        else if (owner.IsUncovered)
         {
-            string renderText = "  ";
-            TileColour tileColour;
-
-            if (owner.IsUncovered)
+            switch (owner.GetType().Name)
             {
-                switch (owner.GetType().Name)
-                {
-                    case nameof(ClearTile):
-                        tileColour = tileColours["uncovered"];
-                        ClearTile t = (ClearTile)owner;
-                        if (t.MinesAround != 0)
-                            renderText = t.MinesAround.ToString("00");
-                        break;
-                    case nameof(MineTile):
-                        tileColour = tileColours["mine"];
-                        break;
-                    default:
-                        tileColour = tileColours["default"];
-                        break;
-                }
+                case nameof(ClearTile):
+                    tileColour = tileColours["uncovered"];
+                    ClearTile t = (ClearTile)owner;
+                    if (t.MinesAround != 0)
+                        renderText = t.MinesAround.ToString("00");
+                    break;
+                case nameof(MineTile):
+                    tileColour = tileColours["uncovered"];
+                    break;
+                default:
+                    tileColour = tileColours["default"];
+                    break;
             }
-            else
-                tileColour = owner.IsMarked ? tileColours["marked"] : tileColours["regular"];
-
-            ConsoleColor renderColour = isDarker ? tileColour.Dark : tileColour.Light;
-            return new(renderText, Enumerable.Repeat(renderColour, renderText.Length).ToArray());
         }
+        else
+            tileColour = owner.IsMarked ? tileColours["marked"] : tileColours["regular"];
+
+        ConsoleColor renderColour = isDarker ? tileColour.Dark : tileColour.Light;
+        return new(renderText, Enumerable.Repeat(renderColour, renderText.Length).ToArray());
     }
 }
 

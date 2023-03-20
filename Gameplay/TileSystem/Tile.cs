@@ -7,6 +7,7 @@ namespace Minesweeper.Gameplay.TileSystem;
 /// </summary>
 internal abstract class Tile
 {
+    public Map Parent { get; init; }
     /// <summary>
     /// Where this tile is on the map
     /// </summary>
@@ -48,12 +49,11 @@ internal abstract class Tile
     /// <summary>
     /// Returns a two chars long string to be rendered as the texture of this tile
     /// </summary>
-    public RenderLine Texture { get => renderer.Texture; }
+    public RenderLine GetTexture(bool isDebug) => renderer.GetTexture(isDebug);
 
     protected bool isUncovered;
     protected bool isMarked;
     protected TileTexture renderer;
-    protected Map parent;
 
     public Tile(int x, int y, bool isDarker, Map parent)
     {
@@ -61,7 +61,7 @@ internal abstract class Tile
         IsUncovered = false;
         Position = new(x, y);
         renderer = new(this, isDarker);
-        this.parent = parent;
+        this.Parent = parent;
     }
 
     /// <summary>

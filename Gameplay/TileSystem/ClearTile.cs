@@ -42,7 +42,7 @@ internal class ClearTile : Tile
     protected override void OnUncover()
     {
         // Trigger the mass expose if this tile belonged to a chunk
-        parent.DigsLeft--;
+        Parent.DecreaseDigsLeft();
         Chunk?.Expose();
     }
 }

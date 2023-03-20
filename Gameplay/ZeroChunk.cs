@@ -36,4 +36,17 @@ internal class ZeroChunk
                 t.IsUncovered = true;
         }
     }
+
+    public override string ToString()
+    {
+        string result = "";
+
+        foreach (Tile t in tiles)
+        {
+            result += t.Position.ToString();
+        }
+        result += "\n";
+
+        return result;
+    }
 }
