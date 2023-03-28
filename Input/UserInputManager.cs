@@ -5,7 +5,7 @@ namespace Minesweeper.Input;
 /// <summary>
 /// A class used for gathering keypress input from the user
 /// </summary>
-internal static class InputManager
+internal class UserInputManager : IInputManager
 {
     /// <summary>
     /// Remembers all the possible commands
@@ -24,7 +24,7 @@ internal static class InputManager
     /// </summary>
     /// <param name="commandData">An out parameter for the command data</param>
     /// <returns>A command to be executed on the command data (can be null)</returns>
-    public static Command? TakeInput(out string[] commandData)
+    public Command? TakeInput(out string[] commandData)
     {
         commandData = Array.Empty<string>();
 

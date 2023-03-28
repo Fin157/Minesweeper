@@ -12,7 +12,7 @@ internal static class CommandMethods
     public static void HelpCommand(Map map, string[] userInput)
     {
         // Show all the available command names, descriptions and parameters
-        foreach (Command c in InputManager.CommandMappings)
+        foreach (Command c in UserInputManager.CommandMappings)
             BufferedRenderer.AddToAdditional(c.ToString());
     }
 
@@ -21,7 +21,7 @@ internal static class CommandMethods
         BufferedRenderer.AddToAdditional("Quitting game...");
 
         // Stop the main loop
-        Game.IsLoopAlive = false;
+        map.Game.IsLoopAlive = false;
     }
 
     public static void DigTileCommand(Map map, string[] userInput)
@@ -70,6 +70,6 @@ internal static class CommandMethods
         }
         catch { }
 
-        Game.IsDebugOn = newDebugOn;
+        map.Game.IsDebugOn = newDebugOn;
     }
 }

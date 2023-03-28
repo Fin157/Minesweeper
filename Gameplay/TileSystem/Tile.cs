@@ -61,7 +61,7 @@ internal abstract class Tile
         IsUncovered = false;
         Position = new(x, y);
         renderer = new(this, isDarker);
-        this.Parent = parent;
+        Parent = parent;
     }
 
     /// <summary>

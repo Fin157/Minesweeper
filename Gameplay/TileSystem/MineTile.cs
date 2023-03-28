@@ -16,6 +16,6 @@ internal class MineTile : Tile
 
         BufferedRenderer.AddToAdditional("Oh no! You exploded!");
 
-        Game.IsLoopAlive = false;
+        Parent.Game.IsLoopAlive = false;
     }
 }

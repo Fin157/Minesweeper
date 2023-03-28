@@ -31,6 +31,7 @@ internal class Map
     /// Returns true if digs the user has to do yet equals 0, otherwise false
     /// </summary>
     public bool IsMapClear { get => digsLeft == 0; }
+    public Game Game { get; init; }
 
     private int digsLeft;
     private readonly Tile[,] tiles;
@@ -41,8 +42,9 @@ internal class Map
     private List<ZeroChunk> zeroChunks;
 
 
-    private Map(int sizeX, int sizeY)
+    private Map(Game game, int sizeX, int sizeY)
     {
+        Game = game;
         tiles = new Tile[sizeY, sizeX];
         renderer = new(this);
         zeroChunks = new();
@@ -70,9 +72,9 @@ internal class Map
     /// <param name="mapSizeY">The Y size of the map</param>
     /// <param name="mineCount">Controls how many mines will be generated</param>
     /// <returns>The newly generated map</returns>
-    public static Map GenerateMap(int mapSizeX, int mapSizeY, int mineCount)
+    public static Map GenerateMap(Game owner, int mapSizeX, int mapSizeY, int mineCount)
     {
-        Map map = new(mapSizeX, mapSizeY);
+        Map map = new(owner, mapSizeX, mapSizeY);
 
         // Populate the map with tiles
         List<Position> available = InitMap(map);

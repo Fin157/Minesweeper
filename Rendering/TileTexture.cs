@@ -1,5 +1,4 @@
-﻿using Minesweeper.Gameplay;
-using Minesweeper.Gameplay.TileSystem;
+﻿using Minesweeper.Gameplay.TileSystem;
 
 namespace Minesweeper.Rendering;
 
@@ -42,7 +41,7 @@ internal class TileTexture
         string renderText = "  ";
         TileColour tileColour;
 
-        if (!Game.IsGameRunning() && owner is MineTile)
+        if (!owner.Parent.Game.IsGameRunning() && owner is MineTile)
             tileColour = tileColours["mine"];
         else if (owner.IsUncovered)
         {

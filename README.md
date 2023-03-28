@@ -1,2 +1,2 @@
 # Minesweeper
-A simple minesweeper game.
+A simple minesweeper game for AI to play.

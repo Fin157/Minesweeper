@@ -24,6 +24,9 @@ internal class ClearTile : Tile
             }
         }
     }
+    /// <summary>
+    /// A chunk this tile belongs in
+    /// </summary>
     public ZeroChunk? Chunk { get; set; }
 
     /// <summary>
