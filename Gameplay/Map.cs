@@ -38,13 +38,16 @@ internal class Map
     private readonly MapRenderer renderer;
 
 
-    private List<ZeroChunk> zeroChunks = new();
+    // TEMPORARY!!!
+    private List<ZeroChunk> zeroChunks;
+
 
     private Map(Game game, int sizeX, int sizeY)
     {
         Game = game;
         tiles = new Tile[sizeY, sizeX];
         renderer = new(this);
+        zeroChunks = new();
     }
 
     public void DecreaseDigsLeft() => digsLeft--;
@@ -59,11 +62,7 @@ internal class Map
     /// <summary>
     /// Tells the renderer to fill the buffer with tile textures
     /// </summary>
-    public void RenderMap(bool isDebug)
-    {
-        renderer.Render(isDebug);
-        temp_RenderZeroChunks(this, zeroChunks);
-    }
+    public void RenderMap(bool isDebug) => renderer.Render(isDebug);
 
     #region Static map generation methods
     /// <summary>
@@ -73,56 +72,19 @@ internal class Map
     /// <param name="mapSizeY">The Y size of the map</param>
     /// <param name="mineCount">Controls how many mines will be generated</param>
     /// <returns>The newly generated map</returns>
-    public static Map GenerateMap(Game game, int mapSizeX, int mapSizeY, int mineCount)
+    public static Map GenerateMap(Game owner, int mapSizeX, int mapSizeY, int mineCount)
     {
-        Map map = new(game, mapSizeX, mapSizeY);
+        Map map = new(owner, mapSizeX, mapSizeY);
 
         // Populate the map with tiles
         List<Position> available = InitMap(map);
         List<Position> clearTiles = PlaceMines(map, available, mineCount);
         List<ZeroChunk> zeroChunks = CalculateClearTiles(map, clearTiles);
-
         map.zeroChunks = zeroChunks;
-
         int initialVisibleSize = ExposeLargestChunk(zeroChunks);
         map.digsLeft = mapSizeX * mapSizeY - mineCount - initialVisibleSize;
 
         return map;
-    }
-
-    private static void temp_RenderZeroChunks(Map map, List<ZeroChunk> zeroChunks)
-    {
-        bool[,] dataBuffer = new bool[map.LengthY, map.LengthX];
-
-        foreach (ZeroChunk chunk in zeroChunks)
-        {
-            chunk.temp_UpdateDataBuffer(dataBuffer);
-        }
-
-        string headerLine = "";
-        for (int x = 0; x < dataBuffer.GetLength(1); x++)
-        {
-            headerLine += "  ";
-        }
-        BufferedRenderer.AddToAdditional(headerLine);
-
-        for (int y = 0; y < dataBuffer.GetLength(0); y++)
-        {
-            string line = "  ";
-            List<ConsoleColor> renderColours = new()
-            {
-                ConsoleColor.Black,
-                ConsoleColor.Black
-            };
-            for (int x = 0; x < dataBuffer.GetLength(1); x++)
-            {
-                line += "  ";
-                ConsoleColor renderColour = dataBuffer[y, x] ? ConsoleColor.DarkBlue : ConsoleColor.Blue;
-                renderColours.Add(renderColour);
-                renderColours.Add(renderColour);
-            }
-            BufferedRenderer.AddToAdditional(new RenderLine(line, renderColours.ToArray()));
-        }
     }
 
     private static List<Position> InitMap(Map map)
@@ -215,7 +177,7 @@ internal class Map
                 }
             }
 
-            // Update the clear tile (it definitely is a clear tile so we can just plainly retype it without checking for null)
+            // Update the clear tile (it must be a clear tile so we can just plainly retype it without checking for null)
             ((ClearTile)map[pos.x, pos.y]).MinesAround = minesAround;
 
             // Check if this tile is a zero tile
@@ -231,7 +193,7 @@ internal class Map
                 // Add this tile to the zero chunk
                 chunk.AddTile(map[pos.x, pos.y]);
 
-                // Add all of its neighbours to the zero chunk as well
+                // Add all its neighbours to the zero chunk as well
                 foreach (Position n in neighboursAbsolute)
                     chunk.AddTile(map[n.x, n.y]);
             }
