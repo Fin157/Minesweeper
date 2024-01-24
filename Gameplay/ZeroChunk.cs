@@ -37,12 +37,6 @@ internal class ZeroChunk
         }
     }
 
-    public void temp_UpdateDataBuffer(bool[,] buffer)
-    {
-        foreach (Tile t in tiles)
-            buffer[t.Position.y, t.Position.x] = true;
-    }
-
     public override string ToString()
     {
         string result = "";

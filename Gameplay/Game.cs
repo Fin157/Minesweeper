@@ -14,11 +14,13 @@ internal class Game
 
     private readonly IInputManager player;
     private readonly Map map;
+    private readonly bool renderChanges;
 
-    public Game(IInputManager player, int mapSizeX, int mapSizeY, int mineCount)
+    public Game(IInputManager player, int mapSizeX, int mapSizeY, int mineCount, bool renderChanges)
     {
         this.player = player;
         map = Map.GenerateMap(this, mapSizeX, mapSizeY, mineCount);
+        this.renderChanges = renderChanges;
         GameLoop(map);
     }
 
@@ -54,6 +56,9 @@ internal class Game
 
     private void Render()
     {
+        if (!renderChanges)
+            return;
+
         // Fill the main buffer with tile textures
         map.RenderMap(IsDebugOn);
 
@@ -65,7 +70,7 @@ internal class Game
     /// </summary>
     /// <returns>True if the game should be running, otherwise false</returns>
     public bool IsGameRunning() => IsLoopAlive && !map.IsMapClear;
-    
+
     private void GameEnd()
     {
         // The game didn't end violently (the player won)
