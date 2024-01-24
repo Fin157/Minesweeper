@@ -62,7 +62,7 @@ internal class Map
     public void RenderMap(bool isDebug)
     {
         renderer.Render(isDebug);
-        temp_RenderZeroChunks(this, zeroChunks);
+        //temp_RenderZeroChunks(this, zeroChunks);
     }
 
     #region Static map generation methods
